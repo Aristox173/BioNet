@@ -1,0 +1,38 @@
+version: 2.1
+orbs:
+  node: circleci/node@5
+  evals: circleci/evals@2.0
+jobs:
+  test-node:
+    executor: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run tests
+          command: echo \"No test specified in package.json\"
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: deploy
+          command: "#e.g. ./deploy.sh"
+  evals-test-assertions-job:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - evals/test:
+          assertions: assertions.json
+          metrics: eval_results.json
+          results: test_results.xml
+workflows:
+  build-and-test:
+    jobs:
+      - test-node:
+          context: []
+  test-eval-workflow:
+    jobs:
+      - evals-test-assertions-job
